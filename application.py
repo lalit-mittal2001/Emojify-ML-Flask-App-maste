@@ -2,6 +2,7 @@ from flask import Flask
 from flask import request
 from flask import jsonify
 from flask import render_template
+import flask
 import os
 import sys
 import numpy as np
@@ -11,15 +12,21 @@ import pdb
 from keras.models import Model
 from keras.models import load_model
 from keras.preprocessing.sequence import pad_sequences
+from flask import Flask
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier
 
-app = Flask(__name__)
+app = flask.Flask(__name__)
 
 def get_model():
 	global model
 	model = load_model('emoji_model.h5')
 	print('Model Loaded!!')
 
-graph = tf.compat.v1.get_default_graph()
+
+tf.compat.v1.get_default_graph()
 
 tokenizer = pickle.load(open('tokenizer.pickle','rb'))
 
@@ -27,7 +34,7 @@ tokenizer = pickle.load(open('tokenizer.pickle','rb'))
 def home():
 	return render_template('view.html')
 
-@app.route('/predict',methods = ['POST'])
+@app.route('/predict',methods = ['GET''POST'])
 def predict():
 	global graph
 	global tokenizer
@@ -40,10 +47,10 @@ def predict():
 		response = {
 		'prediction': int(np.argmax(pred))
 		}
-	return jsonify(response)
+	return flask.jsonify(response)
 
 
-@app.route('/update',methods = ['GET''POST'])
+@app.route('/update',methods = ['GET"POST'])
 def update():
 	global graph
 	global tokenizer
@@ -72,8 +79,7 @@ def update():
 		response = {
 		'update_text': 'Updated the values!! Should work in next few attempts..'
 		}
-	return jsonify(response)
+	return flask.jsonify(response)
 
 if __name__ == '__main__':
-	get_model()
 	app.run(threaded=True)
